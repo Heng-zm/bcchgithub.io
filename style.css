@@ -161,11 +161,12 @@ header h2 {
   align-self: flex-end;
   color: #724ae8;
   cursor: pointer;
-  height: 55px;
+  width:65px;
+  height: 60px;
   display: flex;
   align-items: center;
   visibility: hidden;
-  font-size: 1.35rem;
+  font-size: 2.1rem;
 }
 .chat-input textarea:valid ~ span {
   visibility: visible;
