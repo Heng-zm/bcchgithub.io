@@ -3,141 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Send Live Location to Telegram Bot</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <title>Note Taking App</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
+        /* Global Styles */
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 20px;
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
-        #map {
-            height: 400px;
+
+        h2, h3, p {
+            color: #fff;
+            margin: 0;
+        }
+
+        .container, .login-container {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             width: 100%;
-            margin-top: 20px;
-            border: 1px solid #ddd;
+            max-width: 400px;
+            text-align: center;
         }
-        button {
-            background-color: #4CAF50;
-            color: white;
+
+        .hidden {
+            display: none;
+        }
+
+        input, button {
+            font-family: 'Roboto', Arial, sans-serif;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
             border: none;
-            padding: 15px 30px;
-            font-size: 16px;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        button {
+            background: #667eea;
+            color: #fff;
             cursor: pointer;
-            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.3s ease;
         }
+
         button:hover {
-            background-color: #45a049;
+            background: #764ba2;
         }
-        .message {
-            margin-top: 10px;
-            font-size: 18px;
-            color: #333;
+
+        #g_id_onload {
+            margin-bottom: 15px;
         }
     </style>
 </head>
 <body>
-    <h1>Live Location with Telegram Bot</h1>
-    <button id="start-location-btn">Start Tracking</button>
-    <div class="message" id="message"></div>
-    <div id="map"></div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        let map, marker;
-        let watchId;
+<!-- Login Form -->
+<div class="login-container" id="loginContainer">
+    <h2>Welcome Back</h2>
+    <p>Login to access your notes.</p>
+    <div id="g_id_onload"
+         data-client_id="453377407525-aivegjep6kulkhcd8asg46jpotafsj3b.apps.googleusercontent.com"
+         data-context="signin"
+         data-ux_mode="popup"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin"
+         data-type="standard"
+         data-shape="rectangular"
+         data-theme="outline"
+         data-text="sign_in_with"
+         data-size="large"
+         data-logo_alignment="left">
+    </div>
+    <button onclick="showLoginForm()">Login with Username</button>
+    <p>Don't have an account? <a href="#" onclick="showRegister()">Register</a></p>
+</div>
 
-        // Initialize the map
-        function initMap() {
-            map = L.map('map').setView([0, 0], 2); // Default view
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
+<!-- Username/Password Login -->
+<div class="login-container hidden" id="manualLoginContainer">
+    <h2>Login with Username</h2>
+    <input type="text" id="loginUsername" placeholder="Enter your username">
+    <input type="password" id="loginPassword" placeholder="Enter your password">
+    <button onclick="login()">Login</button>
+    <p>Back to <a href="#" onclick="showLogin()">Google Login</a></p>
+</div>
+
+<!-- Registration Form -->
+<div class="login-container hidden" id="registerContainer">
+    <h2>Create Account</h2>
+    <p>Register to start saving your notes.</p>
+    <input type="text" id="registerUsername" placeholder="Choose a username">
+    <input type="password" id="registerPassword" placeholder="Choose a password">
+    <button onclick="register()">Register</button>
+    <p>Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
+</div>
+
+<!-- Note-Taking App -->
+<div class="container hidden" id="noteContainer">
+    <h2>Note Taking App</h2>
+    <textarea id="noteInput" placeholder="Write your note here..."></textarea>
+    <button onclick="saveNote()">Save Note</button>
+    <h3>Your Notes</h3>
+    <ul id="notesList"></ul>
+    <button onclick="signOut()">Sign Out</button>
+</div>
+
+<script>
+    let loggedInUser = null;
+
+    // Show Login Options
+    function showLogin() {
+        document.getElementById("loginContainer").classList.remove("hidden");
+        document.getElementById("manualLoginContainer").classList.add("hidden");
+        document.getElementById("registerContainer").classList.add("hidden");
+        document.getElementById("noteContainer").classList.add("hidden");
+    }
+
+    // Show Username/Password Login
+    function showLoginForm() {
+        document.getElementById("manualLoginContainer").classList.remove("hidden");
+        document.getElementById("loginContainer").classList.add("hidden");
+    }
+
+    // Show Registration Form
+    function showRegister() {
+        document.getElementById("registerContainer").classList.remove("hidden");
+        document.getElementById("manualLoginContainer").classList.add("hidden");
+        document.getElementById("loginContainer").classList.add("hidden");
+    }
+
+    // Google Sign-In Callback
+    function handleCredentialResponse(response) {
+        const credential = response.credential;
+        const payload = parseJwt(credential);
+
+        loggedInUser = payload.name;
+        alert(`Welcome, ${loggedInUser}!`);
+
+        document.getElementById("loginContainer").classList.add("hidden");
+        document.getElementById("noteContainer").classList.remove("hidden");
+        loadNotes();
+    }
+
+    // Parse JWT Token
+    function parseJwt(token) {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    }
+
+    // Register User (Manual)
+    function register() {
+        const username = document.getElementById("registerUsername").value;
+        const password = document.getElementById("registerPassword").value;
+
+        if (!username || !password) {
+            alert("Please fill out all fields!");
+            return;
         }
 
-        // Update the map with the user's location
-        function updateMap(latitude, longitude) {
-            if (marker) {
-                map.removeLayer(marker); // Remove existing marker
-            }
+        let users = JSON.parse(localStorage.getItem("users")) || [];
+        users.push({ username, password });
+        localStorage.setItem("users", JSON.stringify(users));
 
-            // Set the new view and add a marker
-            map.setView([latitude, longitude], 15);
-            marker = L.marker([latitude, longitude]).addTo(map);
-            marker.bindPopup("You are here!").openPopup();
+        alert("Registration successful! You can now log in.");
+        showLogin();
+    }
+
+    // Login User (Manual)
+    function login() {
+        const username = document.getElementById("loginUsername").value;
+        const password = document.getElementById("loginPassword").value;
+
+        let users = JSON.parse(localStorage.getItem("users")) || [];
+        let user = users.find(u => u.username === username && u.password === password);
+
+        if (user) {
+            loggedInUser = user.username;
+            alert(`Welcome, ${loggedInUser}!`);
+            document.getElementById("manualLoginContainer").classList.add("hidden");
+            document.getElementById("noteContainer").classList.remove("hidden");
+            loadNotes();
+        } else {
+            alert("Invalid username or password.");
+        }
+    }
+
+    // Save Notes
+    function saveNote() {
+        const noteContent = document.getElementById("noteInput").value;
+
+        if (!noteContent) {
+            alert("Please enter a note!");
+            return;
         }
 
-        // Send location to Telegram bot
-        function sendLocationToTelegram(latitude, longitude) {
-            const token = '6941579931:AAHJRb_kYDxxutmPJ7ji6F5p_laP1LjOnAA'; // Replace with your bot token
-            const chatId = '1272791365'; // Replace with your chat ID
-            const url = `https://api.telegram.org/bot${token}/sendLocation`;
+        let notes = JSON.parse(localStorage.getItem("savedNotes")) || [];
+        notes.push({ content: noteContent, date: new Date().toLocaleString() });
+        localStorage.setItem("savedNotes", JSON.stringify(notes));
 
-            // Create a request payload
-            const data = {
-                chat_id: chatId,
-                latitude: latitude,
-                longitude: longitude
-            };
+        document.getElementById("noteInput").value = "";
+        loadNotes();
+    }
 
-            // Send the request to Telegram API
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Location sent to Telegram:", data);
-            })
-            .catch(error => {
-                console.error('Error sending location to Telegram:', error);
-            });
-        }
+    // Load Notes
+    function loadNotes() {
+        const notes = JSON.parse(localStorage.getItem("savedNotes")) || [];
+        const notesList = document.getElementById("notesList");
+        notesList.innerHTML = "";
 
-        // Start tracking live location
-        document.getElementById('start-location-btn').addEventListener('click', () => {
-            const messageDiv = document.getElementById('message');
-
-            // Check if Geolocation is available
-            if (!navigator.geolocation) {
-                messageDiv.textContent = "Geolocation is not supported by your browser.";
-                return;
-            }
-
-            // Start watching the location
-            messageDiv.textContent = "Tracking your location...";
-
-            watchId = navigator.geolocation.watchPosition(
-                (position) => {
-                    const latitude = position.coords.latitude;
-                    const longitude = position.coords.longitude;
-
-                    // Display the location
-                    messageDiv.textContent = `Location: Latitude ${latitude}, Longitude ${longitude}`;
-
-                    // Update the map
-                    updateMap(latitude, longitude);
-
-                    // Send the location to Telegram bot
-                    sendLocationToTelegram(latitude, longitude);
-                },
-                (error) => {
-                    console.error('Error getting location:', error);
-                    messageDiv.textContent = "Unable to retrieve location.";
-                },
-                {
-                    enableHighAccuracy: true,
-                    maximumAge: 0, // Don't use cached location
-                    timeout: 5000 // Timeout after 5 seconds
-                }
-            );
+        notes.forEach(note => {
+            const li = document.createElement("li");
+            li.textContent = `${note.content} (Saved on: ${note.date})`;
+            notesList.appendChild(li);
         });
+    }
 
-        // Initialize the map on page load
-        initMap();
-    </script>
+    // Sign Out
+    function signOut() {
+        alert(`${loggedInUser}, you have signed out successfully.`);
+        loggedInUser = null;
+        showLogin();
+    }
+
+    window.onload = showLogin;
+</script>
 </body>
 </html>
